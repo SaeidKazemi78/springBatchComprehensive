@@ -21,15 +21,15 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfig {
+public class BatchConfigSimple {
 
     private final EntityManagerFactory entityManagerFactory;
     private final ItemProcessor personProcessor;
     private final SampleTasklet tasklet;
 
-    public BatchConfig(EntityManagerFactory entityManagerFactory,
-                       ItemProcessor personProcessor,
-                       SampleTasklet tasklet) {
+    public BatchConfigSimple(EntityManagerFactory entityManagerFactory,
+                             ItemProcessor personProcessor,
+                             SampleTasklet tasklet) {
         this.entityManagerFactory = entityManagerFactory;
         this.personProcessor = personProcessor;
         this.tasklet = tasklet;

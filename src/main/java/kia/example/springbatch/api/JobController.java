@@ -15,11 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class JobController {
 
     private final JobLauncher jobLauncher;
-    private final Job job;
+    private final Job processPersonJob;
+    private final Job partitionedJob;
 
-    public JobController(JobLauncher jobLauncher, Job job) {
+    public JobController(JobLauncher jobLauncher,
+                         Job processPersonJob,
+                         Job partitionedJob) {
         this.jobLauncher = jobLauncher;
-        this.job = job;
+        this.processPersonJob = processPersonJob;
+        this.partitionedJob = partitionedJob;
     }
 
     @GetMapping("simple/run")
@@ -30,10 +34,23 @@ public class JobController {
                     .addLong("timestamp", System.currentTimeMillis())
                     .toJobParameters();
 
-            JobExecution execution = jobLauncher.run(job, jobParameters);
+            JobExecution execution = jobLauncher.run(processPersonJob, jobParameters);
             return ResponseEntity.ok("Job started successfully with status: " + execution.getStatus());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Jobs failed to start: " + e.getMessage());
+        }
+    }
+    @GetMapping("partitioning/run")
+    public ResponseEntity<String> runPartitionedJob() {
+        try {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("timestamp", System.currentTimeMillis()) // Unique parameter
+                    .toJobParameters();
+
+            JobExecution execution = jobLauncher.run(partitionedJob, jobParameters);
+            return ResponseEntity.ok("Job started successfully with status: " + execution.getStatus());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to start job: " + e.getMessage());
         }
     }
 }

@@ -91,5 +91,9 @@ CREATE SEQUENCE BATCH_JOB_SEQ;
 
 INSERT INTO person (id, first_name, last_name)
 VALUES (1, 'John', 'Doe'),
-       (2, 'Jane', 'Doe'),
-       (3, 'James', 'Smith');
+       (2, 'Jan', 'Smith'),
+       (3, 'kat', 'Brown'),
+       (4, 'Ana', 'Davis'),
+       (5, 'kia', 'Shamaei'),
+       (6, 'kami', 'Shamaei'),
+       (7, 'kam', 'Shamaei');
