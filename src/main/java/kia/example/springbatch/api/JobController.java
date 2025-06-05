@@ -17,13 +17,15 @@ public class JobController {
     private final JobLauncher jobLauncher;
     private final Job processPersonJob;
     private final Job partitionedJob;
+    private final Job partitionedJobIntegration;
 
     public JobController(JobLauncher jobLauncher,
                          Job processPersonJob,
-                         Job partitionedJob) {
+                         Job partitionedJob, Job partitionedJobIntegration) {
         this.jobLauncher = jobLauncher;
         this.processPersonJob = processPersonJob;
         this.partitionedJob = partitionedJob;
+        this.partitionedJobIntegration = partitionedJobIntegration;
     }
 
     @GetMapping("simple/run")
@@ -48,6 +50,19 @@ public class JobController {
                     .toJobParameters();
 
             JobExecution execution = jobLauncher.run(partitionedJob, jobParameters);
+            return ResponseEntity.ok("Job started successfully with status: " + execution.getStatus());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to start job: " + e.getMessage());
+        }
+    }
+    @GetMapping("integration/run")
+    public ResponseEntity<String> runIntegrationJob() {
+        try {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("timestamp", System.currentTimeMillis()) // Unique parameter
+                    .toJobParameters();
+
+            JobExecution execution = jobLauncher.run(partitionedJobIntegration, jobParameters);
             return ResponseEntity.ok("Job started successfully with status: " + execution.getStatus());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to start job: " + e.getMessage());
