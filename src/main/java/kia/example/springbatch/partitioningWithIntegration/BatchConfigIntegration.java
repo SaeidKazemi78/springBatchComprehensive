@@ -75,7 +75,10 @@ public class BatchConfigIntegration {
 
     @Bean
     public Step masterStepIntegration(JobRepository jobRepository, @Qualifier("partitionerIntegration") ColumnRangePartitioner partitioner) {
-        return new StepBuilder("masterStepIntegration", jobRepository).partitioner("workerStepIntegration", partitioner).partitionHandler(partitionHandlerIntegration()).build();
+        return new StepBuilder("masterStepIntegration", jobRepository)
+                .partitioner("workerStepIntegration", partitioner)
+                .partitionHandler(partitionHandlerIntegration())
+                .build();
     }
 
     // ** WORKER LOGIC **
@@ -95,8 +98,15 @@ public class BatchConfigIntegration {
 
     @Bean
     @Qualifier("workerStepIntegration")
-    public Step workerStepIntegration(JobRepository jobRepository, PlatformTransactionManager transactionManager, @Qualifier("readerPartitionerIntegration") JpaPagingItemReader<Person> readerPartitioner) {
-        return new StepBuilder("workerStepIntegration", jobRepository).<Person, PersonAfterProcess>chunk(2, transactionManager).reader(readerPartitioner).processor(personProcessor).writer(writerPartitionerIntegration()).build();
+    public Step workerStepIntegration(JobRepository jobRepository,
+                                      PlatformTransactionManager transactionManager,
+                                      @Qualifier("readerPartitionerIntegration") JpaPagingItemReader<Person> readerPartitioner) {
+        return new StepBuilder("workerStepIntegration", jobRepository)
+                .<Person, PersonAfterProcess>chunk(2, transactionManager)
+                .reader(readerPartitioner)
+                .processor(personProcessor).
+                writer(writerPartitionerIntegration())
+                .build();
     }
 
     @ServiceActivator(inputChannel = "requests")
@@ -118,6 +128,8 @@ public class BatchConfigIntegration {
 
     @Bean
     public Job partitionedJobIntegration(Step masterStepIntegration, JobRepository jobRepository) {
-        return new JobBuilder("partitionedJobIntegration", jobRepository).start(masterStepIntegration).build();
+        return new JobBuilder("partitionedJobIntegration", jobRepository)
+                .start(masterStepIntegration)
+                .build();
     }
 }

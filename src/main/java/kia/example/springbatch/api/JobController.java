@@ -19,17 +19,19 @@ public class JobController {
     private final Job partitionedJob;
     private final Job partitionedJobIntegration;
     private final Job partitionJobWithKafka;
+    private final Job partitionedJobIntegrationKafka;
 
     public JobController(JobLauncher jobLauncher,
                          Job processPersonJob,
                          Job partitionedJob,
                          Job partitionedJobIntegration,
-                         Job partitionJobWithKafka) {
+                         Job partitionJobWithKafka, Job partitionedJobIntegrationKafka) {
         this.jobLauncher = jobLauncher;
         this.processPersonJob = processPersonJob;
         this.partitionedJob = partitionedJob;
         this.partitionedJobIntegration = partitionedJobIntegration;
         this.partitionJobWithKafka = partitionJobWithKafka;
+        this.partitionedJobIntegrationKafka = partitionedJobIntegrationKafka;
     }
 
     @GetMapping("simple/run")
@@ -80,6 +82,19 @@ public class JobController {
                     .toJobParameters();
 
             JobExecution execution = jobLauncher.run(partitionJobWithKafka, jobParameters);
+            return ResponseEntity.ok("Job started successfully with status: " + execution.getStatus());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to start job: " + e.getMessage());
+        }
+    }
+    @GetMapping("partitioningWithIntegrationAndKafka/run")
+    public ResponseEntity<String> runPartitioningWithIntegrationAndKafkaJob() {
+        try {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("timestamp", System.currentTimeMillis()) // Unique parameter
+                    .toJobParameters();
+
+            JobExecution execution = jobLauncher.run(partitionedJobIntegrationKafka, jobParameters);
             return ResponseEntity.ok("Job started successfully with status: " + execution.getStatus());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to start job: " + e.getMessage());
